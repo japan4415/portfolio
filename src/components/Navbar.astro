@@ -1,58 +1,148 @@
 ---
+interface Props {
+  home?: boolean;
+}
+
+const { home = false } = Astro.props;
 ---
 
-<nav class="sticky top-0 left-0 z-10 bg-blue-600/95 backdrop-blur-sm w-full text-white flex flex-wrap items-center justify-between py-3 px-6 shadow-md" role="navigation">
-  <a class="flex items-center gap-2" href="#top">
-    <span class="text-2xl font-bold">Yoshihiko Kato</span>
-    <span class="hidden sm:inline text-sm opacity-75">a.k.a. discord4415</span>
-  </a>
-  <button
-    id="menu-toggle"
-    class="md:hidden p-2 rounded hover:bg-blue-700 transition-colors"
-    type="button"
-    aria-label="メニューを開閉"
-    aria-expanded="false"
-    aria-controls="menu"
-  >
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  </button>
-  <ul class="hidden md:flex items-center gap-1 w-full md:w-auto flex-col md:flex-row bg-blue-600 md:bg-transparent" id="menu">
-    <li><a class="hover:bg-blue-700 rounded px-3 py-3 md:py-2 transition-colors block" href="#it">興味</a></li>
-    <li><a class="hover:bg-blue-700 rounded px-3 py-3 md:py-2 transition-colors block" href="#wh">職歴</a></li>
-    <li><a class="hover:bg-blue-700 rounded px-3 py-3 md:py-2 transition-colors block" href="#kb">研究</a></li>
-    <li><a class="hover:bg-blue-700 rounded px-3 py-3 md:py-2 transition-colors block" href="#ks">趣味</a></li>
-    <li><a class="hover:bg-blue-700 rounded px-3 py-3 md:py-2 transition-colors block" href="#jr">受賞歴</a></li>
-    <li><a class="hover:bg-blue-700 rounded px-3 py-3 md:py-2 transition-colors block" href="#works">制作物</a></li>
-  </ul>
-</nav>
+<header class="site-header bg-blue-600/95 text-white shadow-md backdrop-blur-sm">
+  <div class="header-inner mx-auto flex max-w-6xl items-center justify-between gap-2 px-6 py-3">
+    <a class="flex items-center gap-2" href={home ? '/' : '#top'}>
+      <span class="text-2xl font-bold">Yoshihiko Kato</span>
+      <span class="hidden text-sm text-white sm:inline">a.k.a. discord4415</span>
+    </a>
+
+    <nav class="site-nav" aria-label="プライマリ">
+      <button
+        class="menu-button inline-flex size-11 items-center justify-center rounded p-2 transition-colors hover:bg-blue-700"
+        type="button"
+        popovertarget="site-menu"
+        aria-controls="site-menu"
+        aria-label="メニューを開閉"
+      >
+        <svg class="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <ul id="site-menu" class="site-menu" popover="auto">
+        <li><a class="block rounded px-3 py-3 text-center transition-colors hover:bg-blue-700 md:py-2" href={home ? '/#it' : '#it'}>興味</a></li>
+        <li><a class="block rounded px-3 py-3 text-center transition-colors hover:bg-blue-700 md:py-2" href={home ? '/#wh' : '#wh'}>職歴</a></li>
+        <li><a class="block rounded px-3 py-3 text-center transition-colors hover:bg-blue-700 md:py-2" href={home ? '/#kb' : '#kb'}>研究</a></li>
+        <li><a class="block rounded px-3 py-3 text-center transition-colors hover:bg-blue-700 md:py-2" href={home ? '/#ks' : '#ks'}>趣味</a></li>
+        <li><a class="block rounded px-3 py-3 text-center transition-colors hover:bg-blue-700 md:py-2" href={home ? '/#jr' : '#jr'}>受賞歴</a></li>
+        <li><a class="block rounded px-3 py-3 text-center transition-colors hover:bg-blue-700 md:py-2" href={home ? '/#works' : '#works'}>制作物</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
 <script>
-  const toggle = document.getElementById('menu-toggle');
-  const menu = document.getElementById('menu');
-  if (toggle && menu) {
-    toggle.addEventListener('click', () => {
-      if (menu.classList.contains('hidden') && !window.matchMedia('(min-width: 768px)').matches) {
-        menu.classList.remove('hidden');
-        menu.classList.add('flex');
-        toggle.setAttribute('aria-expanded', 'true');
-      } else if (!window.matchMedia('(min-width: 768px)').matches) {
-        menu.classList.add('hidden');
-        menu.classList.remove('flex');
-        toggle.setAttribute('aria-expanded', 'false');
-      }
-    });
+  const header = document.querySelector('.site-header');
+  const inner = header?.querySelector('.header-inner');
+  const menu = document.getElementById('site-menu');
+  const button = document.querySelector('.menu-button');
+  const supportsPopover = Object.hasOwn(HTMLElement.prototype, 'popover');
 
-    // メニューリンクをクリックしたらメニューを閉じる
-    menu.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
-        if (!window.matchMedia('(min-width: 768px)').matches) {
-          menu.classList.add('hidden');
-          menu.classList.remove('flex');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      });
+  button?.setAttribute('aria-expanded', 'false');
+
+  if (!supportsPopover && menu && button) {
+    menu.removeAttribute('popover');
+    button.addEventListener('click', () => {
+      const open = menu.classList.toggle('is-open');
+      button.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (event) => {
+      if (!menu.classList.contains('is-open')) return;
+      if (menu.contains(event.target) || button.contains(event.target)) return;
+      menu.classList.remove('is-open');
+      button.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || !menu.classList.contains('is-open')) return;
+      menu.classList.remove('is-open');
+      button.setAttribute('aria-expanded', 'false');
+      button.focus();
     });
   }
+
+  function syncHeaderHeight() {
+    if (!header) return;
+    document.documentElement.style.setProperty(
+      '--header-height',
+      `${header.getBoundingClientRect().height}px`,
+    );
+  }
+
+  const applyMode = () => {
+    if (!header || !inner || !menu) return;
+
+    const wasOpen = supportsPopover
+      ? menu.matches(':popover-open')
+      : menu.classList.contains('is-open');
+    header.classList.add('is-measuring');
+    header.classList.add('is-wide');
+    menu.removeAttribute('popover');
+
+    const fits = inner.scrollWidth <= inner.clientWidth;
+    header.classList.remove('is-measuring');
+
+    if (fits) {
+      button?.setAttribute('aria-expanded', 'false');
+      syncHeaderHeight();
+      return;
+    }
+
+    header.classList.remove('is-wide');
+    if (supportsPopover) menu.setAttribute('popover', 'auto');
+    else menu.classList.remove('is-open');
+    button?.setAttribute('aria-expanded', 'false');
+    if (wasOpen) {
+      if (supportsPopover) menu.showPopover();
+      else {
+        menu.classList.add('is-open');
+        button?.setAttribute('aria-expanded', 'true');
+      }
+    }
+    syncHeaderHeight();
+  };
+
+  let frame = 0;
+  const schedule = () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(applyMode);
+  };
+
+  let lastLayoutKey = '';
+  const layoutKey = () =>
+    inner ? `${inner.clientWidth}:${getComputedStyle(document.documentElement).fontSize}` : '';
+  const checkLayout = () => {
+    const key = layoutKey();
+    if (key === lastLayoutKey) return;
+    lastLayoutKey = key;
+    schedule();
+  };
+
+  applyMode();
+  syncHeaderHeight();
+  lastLayoutKey = layoutKey();
+  if (header) new ResizeObserver(syncHeaderHeight).observe(header);
+  window.addEventListener('resize', checkLayout);
+  if (inner) new ResizeObserver(checkLayout).observe(inner);
+  document.fonts?.ready.then(checkLayout);
+
+  menu?.addEventListener('toggle', (event) => {
+    button?.setAttribute('aria-expanded', event.newState === 'open' ? 'true' : 'false');
+  });
+
+  menu?.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('a')) return;
+    if (menu.hasAttribute('popover')) {
+      menu.hidePopover();
+    } else {
+      menu.classList.remove('is-open');
+      button?.setAttribute('aria-expanded', 'false');
+    }
+  });
 </script>

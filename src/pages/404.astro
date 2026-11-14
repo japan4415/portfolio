@@ -1,0 +1,27 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="ページが見つかりません"
+  description="お探しのページは見つかりませんでした。"
+  noindex
+>
+  <Navbar home />
+  <main id="main" tabindex="-1" class="flex min-h-[60vh] items-center justify-center px-6 py-24">
+    <div class="text-center">
+      <p class="text-6xl font-bold text-blue-600">404</p>
+      <h1 class="mt-4 text-3xl font-bold">ページが見つかりません</h1>
+      <p class="mt-4 text-gray-600">お探しのページは移動または削除された可能性があります。</p>
+      <a
+        href="/"
+        class="mt-8 inline-block rounded-lg bg-blue-600 px-6 py-3 font-bold text-white transition-colors hover:bg-blue-700"
+      >
+        トップページへ戻る
+      </a>
+    </div>
+  </main>
+  <Footer />
+</Layout>
