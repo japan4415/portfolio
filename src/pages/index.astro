@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
 import Profile from '../components/Profile.astro';
 import Interest from '../components/Interest.astro';
 import WorkHistory from '../components/WorkHistory.astro';
@@ -8,13 +9,11 @@ import Research from '../components/Research.astro';
 import Hobbies from '../components/Hobbies.astro';
 import Awards from '../components/Awards.astro';
 import Works from '../components/Works.astro';
-
-const year = new Date().getFullYear();
 ---
 
 <Layout>
   <Navbar />
-  <main>
+  <main id="main" tabindex="-1">
     <section id="top" class="bg-white">
       <Profile />
     </section>
@@ -37,7 +36,5 @@ const year = new Date().getFullYear();
       <Works />
     </section>
   </main>
-  <footer class="bg-blue-600 text-white py-8 text-center">
-    <p>&copy; {year} Yoshihiko Kato. All rights reserved.</p>
-  </footer>
+  <Footer />
 </Layout>
